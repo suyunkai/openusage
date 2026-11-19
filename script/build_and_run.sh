@@ -46,7 +46,7 @@ DEMO_APP_BUNDLE="$DIST_DIR/OpenUsage Demo.app"
 DEMO_APP_BINARY="$DEMO_APP_BUNDLE/Contents/MacOS/$TARGET_NAME"
 CLI_BINARY="$APP_HELPERS/openusage"
 INFO_PLIST="$APP_CONTENTS/Info.plist"
-SIGN_ENTITLEMENTS="$ROOT_DIR/script/OpenUsage.local.entitlements.plist"
+SIGN_ENTITLEMENTS="${SIGN_ENTITLEMENTS:-$ROOT_DIR/script/OpenUsage.local.entitlements.plist}"
 
 # Stop only the dev builds staged here, never an installed OpenUsage with the same executable name.
 pkill -f "^$APP_BINARY" >/dev/null 2>&1 || true

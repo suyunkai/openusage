@@ -21,6 +21,7 @@ if [ ! -d "$(xcode-select -p 2>/dev/null)/Platforms" ]; then
     git checkout -q -- Package.resolved 2>/dev/null || true )
 fi
 export BUNDLE_ID="com.robinebers.openusage"
+export SIGN_ENTITLEMENTS="$ROOT_DIR/script/OpenUsage.zh.entitlements.plist"
 export APP_VERSION="${APP_VERSION:-0.8.0-zh ($(git -C "$ROOT_DIR" rev-parse --short HEAD))}"
 "$ROOT_DIR/script/build_and_run.sh" build
 
