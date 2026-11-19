@@ -270,6 +270,7 @@ T = {
 "{} at {}": "{} {}",
 "soon": "即将",
 "Resets soon": "即将重置",
+"expires {}": "{}到期",
 # Notifications
 "Critical": "严重",
 "Burning Fast": "消耗过快",

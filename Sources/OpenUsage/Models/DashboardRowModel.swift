@@ -24,7 +24,14 @@ extension WidgetData {
     func dashboardRow(now: Date = Date()) -> DashboardRowModel {
         guard hasData, isBounded else {
             let figures = unboundedFigures
-            let detail = figures.count > 1 ? figures.dropFirst().joined(separator: " · ") : nil
+            var details = Array(figures.dropFirst())
+            // A row of resets also names when the next one expires, like `1 可用 · 12月13日到期`.
+            if showsResetExpiries, hasData, let soonest = expiriesAt.filter({ $0 > now }).min() {
+                let locale = Locale(identifier: Bundle.main.preferredLocalizations.first ?? "en")
+                let day = soonest.formatted(.dateTime.month(.abbreviated).day().locale(locale))
+                details.append(L("expires \(day)"))
+            }
+            let detail = details.isEmpty ? nil : details.joined(separator: " · ")
             return DashboardRowModel(label: title, mark: .value(figures[0], detail: detail, severity: expirySeverity(now: now)))
         }
         return DashboardRowModel(
