@@ -49,7 +49,10 @@ enum Formatters {
     /// "3m 12d", and `compactDuration` below that.
     static func countdown(to date: Date, now: Date = Date(), calendar: Calendar = .current) -> String? {
         let left = calendar.dateComponents([.month, .day], from: now, to: date)
-        if let months = left.month, months >= 1 { return "\(months)m \(left.day ?? 0)d" }
+        if let months = left.month, months >= 1 {
+            if DurationFormatSetting.current == .localized { return DurationFormatSetting.spelledOut(days: left.day ?? 0, months: months) }
+            return "\(months)m \(left.day ?? 0)d"
+        }
         return compactDuration(date.timeIntervalSince(now))
     }
 
@@ -60,6 +63,11 @@ enum Formatters {
         let hours = (totalMinutes % (24 * 60)) / 60
         let minutes = totalMinutes % 60
 
+        if DurationFormatSetting.current == .localized {
+            return days > 0
+                ? DurationFormatSetting.spelledOut(days: days, hours: hours)
+                : DurationFormatSetting.spelledOut(hours: hours, minutes: minutes)
+        }
         if days > 0 {
             return "\(days)d \(hours)h"
         }

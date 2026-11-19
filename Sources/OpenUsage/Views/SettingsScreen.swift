@@ -13,6 +13,7 @@ struct SettingsScreen: View {
     @Environment(LayoutStore.self) private var layout
     @AppStorage(AppearanceSetting.key) private var appearance = AppearanceSetting.system
     @AppStorage(TimeFormatSetting.key) private var timeFormat = TimeFormatSetting.auto
+    @AppStorage(DurationFormatSetting.key) private var durationFormat = DurationFormatSetting.localized
     @AppStorage(DashboardTab.defaultKey) private var defaultTab = DashboardTab.priority
     @AppStorage(PaceMilestone.critical.settingKey) private var criticalAlert = false
     @AppStorage(PaceMilestone.warning.settingKey) private var warningAlert = false
@@ -80,6 +81,7 @@ struct SettingsScreen: View {
             picker("Theme", selection: $appearance, options: AppearanceSetting.allCases.map { ($0, $0.label) })
                 .onChange(of: appearance) { AppearanceSetting.applyCurrent() }
             picker("Time Format", selection: $timeFormat, options: TimeFormatSetting.allCases.map { ($0, $0.label) })
+            picker("Duration Format", selection: $durationFormat, options: DurationFormatSetting.allCases.map { ($0, $0.label) })
         }
         Section {
             Picker("Language", selection: $language) {

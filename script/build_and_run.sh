@@ -33,7 +33,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # The dev build is labelled by its commit ("dev (abc1234)" in the footer and About panel), so it never
 # carries a stale release number. Releases take their version from the tag; see script/release.sh.
 # A copy without Git history, such as an Amp Mac satellite's mirror of an orb, builds as "dev (unknown)".
-APP_VERSION="dev ($(git -C "$ROOT_DIR" rev-parse --short HEAD 2>/dev/null || echo unknown))"
+APP_VERSION="${APP_VERSION:-dev ($(git -C "$ROOT_DIR" rev-parse --short HEAD 2>/dev/null || echo unknown))}"
 APP_BUILD="$(git -C "$ROOT_DIR" rev-list --count HEAD 2>/dev/null || echo 1)"
 DIST_DIR="$ROOT_DIR/dist"
 APP_BUNDLE="$DIST_DIR/$APP_DISPLAY.app"
@@ -59,7 +59,10 @@ if "$DEVELOPMENT_BUILD"; then
   BUILD_ARGS+=(--scratch-path "$ROOT_DIR/.build/development" -Xswiftc -DOPENUSAGE_DEVELOPMENT)
   BUILD_ARTIFACTS="$ROOT_DIR/.build/development/artifacts"
 fi
-swift build "${BUILD_ARGS[@]}"
+# Extract the localizable strings with their exact keys (format specifiers included) for the table.
+L10N_DATA="$ROOT_DIR/.build/l10n-stringsdata"
+rm -rf "$L10N_DATA"; mkdir -p "$L10N_DATA"
+swift build "${BUILD_ARGS[@]}" -Xswiftc -emit-localized-strings -Xswiftc -emit-localized-strings-path -Xswiftc "$L10N_DATA"
 BUILD_DIR="$(swift build "${BUILD_ARGS[@]}" --show-bin-path)"
 BUILD_BINARY="$BUILD_DIR/$TARGET_NAME"
 BUILD_CLI_BINARY="$BUILD_DIR/openusage-cli"
@@ -103,6 +106,9 @@ for bundle in "$BUILD_DIR"/*.bundle; do
 done
 shopt -u nullglob
 
+echo "==> writing Localizable.strings (en, zh-Hans)"
+python3 "$ROOT_DIR/script/l10n/build_strings.py" "$APP_RESOURCES" "$L10N_DATA"
+
 # Install the prebuilt app icon, like the release build: actool crashes on the Icon Composer source
 # (assets/AppIcon.icon) on current toolchains, so script/compile_icon.sh regenerates
 # assets/AppIcon.prebuilt whenever the source changes. CFBundleIconName below must match the .icon
@@ -116,6 +122,13 @@ cat >"$INFO_PLIST" <<PLIST
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+  <key>CFBundleDevelopmentRegion</key>
+  <string>en</string>
+  <key>CFBundleLocalizations</key>
+  <array>
+    <string>en</string>
+    <string>zh-Hans</string>
+  </array>
   <key>CFBundleExecutable</key>
   <string>$TARGET_NAME</string>
   <key>CFBundleIdentifier</key>

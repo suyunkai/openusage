@@ -196,7 +196,7 @@ final class WidgetDataStore {
                     guard !Task.isCancelled else { return .failure(RefreshFailure(error: CancellationError())) }
                     return await provider.refresh()
                 }
-                    ?? .failure(RefreshFailure(message: L("Refresh timed out after \(Int(providerRefreshTimeout))s"), kind: .refused))
+                    ?? .failure(RefreshFailure(message: L("Refresh timed out after \(DurationFormatSetting.current == .localized ? DurationFormatSetting.spelledOut(seconds: Int(providerRefreshTimeout)) : "\(Int(providerRefreshTimeout))s")"), kind: .refused))
                 guard case .failure(let failure) = result, failure.kind == .offline, let delay = retries.popFirst() else { return result }
                 AppLog.warn(.refresh, "\(providerID) offline: \(failure.message) Retrying in \(Int(delay.rounded(.up)))s.")
                 guard (try? await Task.sleep(for: .seconds(delay))) != nil else { return result }
