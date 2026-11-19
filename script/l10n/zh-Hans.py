@@ -473,6 +473,7 @@ T = {
 "Accounts": "账号",
 # Footer menu and leftovers
 "{}% left": "剩余 {}%",
+"%lld%% left": "剩余 %lld%%",
 "About OpenUsage": "关于 OpenUsage",
 "No Accounts": "没有账号",
 "Report an Issue…": "报告问题…",
