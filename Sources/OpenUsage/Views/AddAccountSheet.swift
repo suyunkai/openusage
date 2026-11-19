@@ -20,6 +20,7 @@ struct AddAccountSheet: View {
                 case .oauth: BrowserSignInStep(flow: flow, provider: provider, cancel: { flow.isSigningInAgain ? dismiss() : flow.back() })
                 case .apiKey(let keyPage): APIKeyStep(flow: flow, provider: provider, keyPage: keyPage, cancel: { flow.back() })
                 case .organizationToken: OrganizationTokenStep(flow: flow, provider: provider, cancel: { flow.back() })
+                case .localCLI: CLILoginStep(flow: flow, provider: provider, cancel: { flow.back() })
                 }
             } else {
                 ProviderChoiceStep(flow: flow, cancel: { dismiss() })
@@ -82,11 +83,18 @@ private struct MethodChoiceStep: View {
     var body: some View {
         SheetHeader(
             provider: provider,
-            title: "Add \(provider.displayName)",
-            message: "Sign in to your own seat, or add your organization’s billing with a token."
+            title: L("Add \(provider.displayName)"),
+            message: provider == .claude
+                ? L("Sign in with your browser, or read the login Claude Code’s CLI already stored on this Mac.")
+                : L("Sign in to your own seat, or add your organization’s billing with a token.")
         )
         ChoiceList(items: provider.authMethods, selection: $selection, choose: { flow.choose($0) }) { method in
-            Text(method == .organizationToken ? "Organization Billing" : "Sign In with GitHub")
+            switch method {
+            case .organizationToken: Text("Organization Billing")
+            case .localCLI: Text("Use Claude Code CLI Login")
+            case .oauth where provider == .copilot: Text("Sign In with GitHub")
+            case .oauth, .apiKey: Text("Sign In with Browser")
+            }
         }
         CancelRow(cancel: cancel)
     }
@@ -357,6 +365,39 @@ private struct OrganizationTokenStep: View {
         SheetButtons(
             secondary: SheetAction(title: "Cancel", shortcut: .cancelAction, action: cancel),
             primary: SheetAction(title: "Add Account", isDisabled: !flow.canAddKey) { flow.addKey() }
+        )
+        .padding(.bottom, 20)
+    }
+}
+
+/// Claude Code's CLI login: read on this Mac, checked with a profile read, never renewed or copied.
+private struct CLILoginStep: View {
+    @Bindable var flow: AddAccountFlow
+    let provider: ProviderKind
+    let cancel: () -> Void
+
+    var body: some View {
+        SheetHeader(
+            provider: provider,
+            title: L("Use Claude Code CLI Login"),
+            message: L("OpenUsage reads the token Claude Code’s CLI keeps in your Keychain and never renews it, so the CLI stays signed in. While the CLI isn’t used its token can expire; run `claude` once and the card comes back.")
+        )
+        Group {
+            if let errorMessage = flow.errorMessage {
+                ErrorText(errorMessage)
+            } else {
+                HStack(spacing: 8) {
+                    ProgressView().controlSize(.small)
+                    Text("Reading the CLI login…").foregroundStyle(.secondary)
+                }
+                .font(.callout)
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(.horizontal, 20)
+        SheetButtons(
+            secondary: SheetAction(title: L("Cancel"), shortcut: .cancelAction, action: cancel),
+            primary: SheetAction(title: L("Try Again"), isDisabled: flow.isWorking) { flow.useCLILogin() }
         )
         .padding(.bottom, 20)
     }

@@ -45,3 +45,10 @@ final class PostHogTelemetrySink: TelemetrySink {
         PostHogSDK.shared.flush()
     }
 }
+
+/// This build is a personal fork: it sends nothing to the upstream project's PostHog.
+@MainActor
+final class NoTelemetrySink: TelemetrySink {
+    func capture(_ event: String, _ properties: [String: Any]) {}
+    func flush() {}
+}

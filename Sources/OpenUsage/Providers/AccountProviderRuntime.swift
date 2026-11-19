@@ -139,6 +139,8 @@ final class AccountProviderRuntime: ProviderRuntime {
             return HubRefusal.noToken.error(host: hub.host, upstream: nil)
         }
         return switch account.authMethod {
+        case .localCLI:
+            .unavailable((ClaudeCodeCLIVault.shared.lastReadError ?? .expired(now())).localizedDescription)
         case .oauth: .signInExpired(account.kind)
         case .apiKey: .keyRejected("\(account.kind.displayName) rejected the API key.")
         case .organizationToken: .keyRejected("GitHub rejected the token.")

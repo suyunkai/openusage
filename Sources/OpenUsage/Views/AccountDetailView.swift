@@ -113,7 +113,7 @@ struct AccountDetailView: View {
         switch account.authMethod {
         case .apiKey: "API Key"
         case .organizationToken: "Token"
-        case .oauth: nil
+        case .oauth, .localCLI: nil
         }
     }
 

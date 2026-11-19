@@ -17,14 +17,16 @@ enum ProviderCatalog {
     ) -> [AccountProviderRuntime] {
         let existingByID = Dictionary(existing.map { ($0.account.id, $0) }, uniquingKeysWith: { first, _ in first })
         return accounts.map { account in
-            guard let runtime = existingByID[account.id], runtime.account.hub == account.hub else {
+            guard let runtime = existingByID[account.id], runtime.account.hub == account.hub,
+                  runtime.account.localSource == account.localSource else {
                 let client: any HTTPClient = switch account.hub {
                 case nil: http
                 case let link? where hubsEnabled:
                     HubTunnel(link: link, kind: account.kind, keys: hubKeys, client: CLIProxyHubClient(http: http, gate: hubGate))
                 case _?: HubOff()
                 }
-                return AccountProviderRuntime(account: account, vault: vault, http: client, claudeSessions: claudeSessions)
+                let accountVault: any CredentialVault = account.localSource == .claudeCodeCLI ? ClaudeCodeCLIVault.shared : vault
+                return AccountProviderRuntime(account: account, vault: accountVault, http: client, claudeSessions: claudeSessions)
             }
             runtime.update(account)
             return runtime

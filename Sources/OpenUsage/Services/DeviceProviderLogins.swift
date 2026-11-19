@@ -272,6 +272,7 @@ struct CopilotOrganizationLogin: ProviderLogin {
 enum ProviderLoginCatalog {
     static func login(for kind: ProviderKind, method: ProviderAuthMethod, organization: String, domain: GitHubDomain) -> any ProviderLogin {
         if method == .organizationToken { return CopilotOrganizationLogin(organization: organization) }
+        if method == .localCLI { return ClaudeCodeCLILogin() }
         return switch kind {
         case .claude: ClaudeLogin()
         case .codex: CodexLogin()

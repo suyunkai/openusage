@@ -5,6 +5,8 @@ enum ProviderAuthMethod: Sendable, Hashable {
     case oauth
     case apiKey(keyPage: URL)
     case organizationToken
+    /// Reads the login another tool already stored on this Mac (Claude Code's CLI); never renewed here.
+    case localCLI
 }
 
 enum ProviderKind: String, Codable, CaseIterable, Sendable {
@@ -69,7 +71,8 @@ enum ProviderKind: String, Codable, CaseIterable, Sendable {
 
     var authMethods: [ProviderAuthMethod] {
         switch self {
-        case .claude, .codex, .cursor, .amp, .antigravity, .devin, .grok, .muse, .opencodeGo: [.oauth]
+        case .claude: [.oauth, .localCLI]
+        case .codex, .cursor, .amp, .antigravity, .devin, .grok, .muse, .opencodeGo: [.oauth]
         case .copilot: [.oauth, .organizationToken]
         case .ollama: [.apiKey(keyPage: URL(string: "https://ollama.com/settings/keys")!)]
         case .openrouter: [.apiKey(keyPage: URL(string: "https://openrouter.ai/settings/management-keys")!)]
@@ -92,9 +95,13 @@ struct Account: Codable, Identifiable, Hashable, Sendable {
     /// account has none.
     var hub: HubLink?
     let addedAt: Date
+    /// An account that reads another tool's stored login (Claude Code's CLI) instead of one OpenUsage
+    /// holds; every other account has none.
+    var localSource: LocalCredentialSource?
 
     var authMethod: ProviderAuthMethod {
-        organization != nil ? .organizationToken : kind.authMethods[0]
+        if localSource != nil { return .localCLI }
+        return organization != nil ? .organizationToken : kind.authMethods[0]
     }
 
     var cardID: String {
@@ -103,8 +110,9 @@ struct Account: Codable, Identifiable, Hashable, Sendable {
 
     init(
         id: UUID = UUID(), kind: ProviderKind, label: String, organization: String? = nil, domain: String? = nil,
-        hub: HubLink? = nil, addedAt: Date = Date()
+        hub: HubLink? = nil, addedAt: Date = Date(), localSource: LocalCredentialSource? = nil
     ) {
+        self.localSource = localSource
         self.id = id
         self.kind = kind
         self.label = label

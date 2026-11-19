@@ -92,6 +92,7 @@ final class AddAccountFlow {
 
     func choose(_ method: ProviderAuthMethod) {
         self.method = method
+        if method == .localCLI { return useCLILogin() }
         if method == .oauth, !isEnteringDomain { signIn() }
     }
 
@@ -149,6 +150,17 @@ final class AddAccountFlow {
         codeInput = continuation
         pastedCode = ""
         run(provider, method, input: input)
+    }
+
+    /// Adds Claude Code's CLI login: read it, prove it with a profile read, and keep nothing of it.
+    func useCLILogin() {
+        guard let provider else { return }
+        if accountSignedInAgain == nil, let existing = store.account(readingLocal: .claudeCodeCLI) {
+            return fail(L("The Claude Code CLI login is already added as \(existing.label)."))
+        }
+        let (input, continuation) = AsyncStream.makeStream(of: String.self)
+        continuation.finish()
+        run(provider, .localCLI, input: input)
     }
 
     func openBrowser() {
@@ -213,12 +225,18 @@ final class AddAccountFlow {
                     pastedCode: input
                 )
                 guard !Task.isCancelled else { return }
-                if let accountSignedInAgain {
+                if let accountSignedInAgain, accountSignedInAgain.localSource != nil {
+                    // Nothing to replace: the account reads the CLI's login on its next pass.
+                    finish()
+                } else if let accountSignedInAgain {
                     try await replaceCredential(result.credential, accountSignedInAgain.cardID)
                     guard !Task.isCancelled else { return }
                     finish()
                 } else {
-                    try save(result, for: kind, organization: organization, domain: gitHubDomain?.saved)
+                    try save(
+                        result, for: kind, organization: organization, domain: gitHubDomain?.saved,
+                        localSource: method == .localCLI ? .claudeCodeCLI : nil
+                    )
                 }
             } catch {
                 guard !Task.isCancelled else { return }
@@ -237,16 +255,17 @@ final class AddAccountFlow {
     }
 
     private func save(
-        _ result: (label: String, credential: AccountCredential), for kind: ProviderKind, organization: String?, domain: String?
+        _ result: (label: String, credential: AccountCredential), for kind: ProviderKind, organization: String?, domain: String?,
+        localSource: LocalCredentialSource? = nil
     ) throws {
-        try store.checkForDuplicate(result.credential, kind: kind, organization: organization)
+        if localSource == nil { try store.checkForDuplicate(result.credential, kind: kind, organization: organization) }
         let name = accountName.trimmed
         let account = store.add(
             kind: kind, label: name.isEmpty ? result.label : name, organization: organization, domain: domain,
-            credential: result.credential
+            localSource: localSource, credential: result.credential
         )
         guard store.accounts.contains(where: { $0.id == account.id }) else {
-            return fail(store.lastError ?? "The account could not be saved.")
+            return fail(store.lastError ?? L("The account could not be saved."))
         }
         finish()
     }
