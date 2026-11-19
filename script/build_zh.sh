@@ -13,6 +13,13 @@ MODE="${1:-build}"
 if [ -z "${CODESIGN_IDENTITY:-}" ] && /usr/bin/security find-certificate -c "OpenUsage Local Signing" >/dev/null 2>&1; then
   export CODESIGN_IDENTITY="OpenUsage Local Signing"
 fi
+# Without Xcode the SwiftUI macro plugins are missing; build KeyboardShortcuts from a patched, editable copy.
+if [ ! -d "$(xcode-select -p 2>/dev/null)/Platforms" ]; then
+  ( cd "$ROOT_DIR"
+    [ -d Packages/KeyboardShortcuts ] || swift package edit KeyboardShortcuts
+    python3 script/patch_deps_for_clt.py Packages/KeyboardShortcuts
+    git checkout -q -- Package.resolved 2>/dev/null || true )
+fi
 export BUNDLE_ID="com.robinebers.openusage"
 export APP_VERSION="${APP_VERSION:-0.8.0-zh ($(git -C "$ROOT_DIR" rev-parse --short HEAD))}"
 "$ROOT_DIR/script/build_and_run.sh" build

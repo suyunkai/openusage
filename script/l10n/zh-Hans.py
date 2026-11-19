@@ -471,4 +471,13 @@ T = {
 "Breakdown Unavailable": "明细不可用",
 "Refresh to load the details for this range.": "刷新以加载这个时间范围的明细。",
 "Accounts": "账号",
+# Footer menu and leftovers
+"{}% left": "剩余 {}%",
+"About OpenUsage": "关于 OpenUsage",
+"No Accounts": "没有账号",
+"Report an Issue…": "报告问题…",
+"Check for Updates…": "检查更新…",
+"Updates": "更新",
+"Check Automatically": "自动检查",
+"Beta Updates": "测试版更新",
 }
