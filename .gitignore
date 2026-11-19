@@ -30,3 +30,5 @@ node_modules/
 # Local appcast / Sparkle feed output
 feed/
 appcast.xml
+__pycache__/
+/Packages/

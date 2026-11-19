@@ -2,7 +2,15 @@ import SwiftUI
 
 extension EnvironmentValues {
     /// On while Privacy Mode sees a capture, and on a copied card while it's on.
-    @Entry var concealsAccountNames = false
+    // Spelled out instead of `@Entry`: the Command Line Tools ship without the SwiftUI macro plugin.
+    var concealsAccountNames: Bool {
+        get { self[ConcealsAccountNamesKey.self] }
+        set { self[ConcealsAccountNamesKey.self] = newValue }
+    }
+}
+
+private struct ConcealsAccountNamesKey: EnvironmentKey {
+    static let defaultValue = false
 }
 
 extension View {

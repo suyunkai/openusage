@@ -181,7 +181,7 @@ enum HubRefusal: Equatable {
         case .noToken:
             .unavailable(L("The CLIProxyAPI hub at \(host) has no working sign-in for this login. Sign it in again on the hub."))
         case .upstreamUnreachable:
-            .unreachable(L("The CLIProxyAPI hub at \(host) couldn’t reach \(upstream ?? L("the provider")).")
+            .unreachable(L("The CLIProxyAPI hub at \(host) couldn’t reach \(upstream ?? L("the provider"))."))
         case .failed(let status):
             .unavailable(L("The CLIProxyAPI hub at \(host) answered with an error (HTTP \(status))."))
         }

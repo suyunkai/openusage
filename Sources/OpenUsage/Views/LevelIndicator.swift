@@ -2,7 +2,15 @@ import SwiftUI
 
 extension EnvironmentValues {
     /// `ImageRenderer` can't draw AppKit controls, so a share image draws its bars as shapes.
-    @Entry var drawsLevelsAsShapes = false
+    // Spelled out instead of `@Entry`: the Command Line Tools ship without the SwiftUI macro plugin.
+    var drawsLevelsAsShapes: Bool {
+        get { self[DrawsLevelsAsShapesKey.self] }
+        set { self[DrawsLevelsAsShapesKey.self] = newValue }
+    }
+}
+
+private struct DrawsLevelsAsShapesKey: EnvironmentKey {
+    static let defaultValue = false
 }
 
 /// A limit's level as Apple's progress bar, with a tick where it would be at an even pace.
