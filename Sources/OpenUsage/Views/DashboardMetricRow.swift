@@ -11,6 +11,8 @@ struct DashboardMetricRow: View {
     /// The account the label names, blurred with the other names while Hide From Screen Share is on.
     var account: Provider?
 
+    @Environment(\.dashboardColumns) private var columns
+
     static let font: Font = .system(size: 12)
     static let resetFont: Font = .system(size: 11)
 
@@ -19,15 +21,22 @@ struct DashboardMetricRow: View {
             switch model.mark {
             case .bar(let fill, let severity, let value, let reset, let isUsedUp):
                 HStack(spacing: DashboardGrid.columnGap) {
+                    let widths = columns ?? .fallback
                     label
-                        .frame(width: DashboardGrid.labelWidth, alignment: .leading)
+                        .frame(width: widths.label, alignment: .leading)
+                        .background(alignment: .leading) {
+                            Text(loc: model.label).lineLimit(1).fixedSize().hidden().measuresDashboardColumn(.label)
+                        }
                     LevelIndicator(fill: fill, severity: severity, paceMark: model.paceMark)
+                        .frame(minWidth: 40)
                         .frame(height: DashboardGrid.levelHeight)
                         .hoverTooltip(paceTooltip)
                     valueText(value, severity: severity)
-                        .frame(width: DashboardGrid.valueWidth, alignment: .trailing)
+                        .measuresDashboardColumn(.value)
+                        .frame(width: max(widths.value, columns == nil ? DashboardGrid.valueWidth : 0), alignment: .trailing)
                     resetText(reset, isUsedUp: isUsedUp)
-                        .frame(width: model.showsClockTimes ? DashboardGrid.clockResetWidth : DashboardGrid.resetWidth, alignment: .trailing)
+                        .measuresDashboardColumn(.reset)
+                        .frame(width: columns == nil ? (model.showsClockTimes ? DashboardGrid.clockResetWidth : DashboardGrid.resetWidth) : widths.reset, alignment: .trailing)
                 }
                 .opacity(model.isFaded ? 0.5 : 1)
             case .value(let text, let detail, let severity):
