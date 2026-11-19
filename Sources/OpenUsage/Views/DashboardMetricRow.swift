@@ -114,7 +114,7 @@ struct DashboardMetricRow: View {
     /// Blank when there's no reset, so the row's bar keeps the same length as its neighbours.
     @ViewBuilder
     private func resetText(_ reset: String?, isUsedUp: Bool) -> some View {
-        let text = Text(reset ?? "")
+        let text = Text(reset == Formatters.imminent ? L("Resets soon") : reset ?? "")
             .font(Self.resetFont)
             .foregroundStyle(Self.amountStyle(isUsedUp ? .critical : .normal))
             .monospacedDigit()

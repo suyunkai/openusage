@@ -269,6 +269,7 @@ T = {
 "tomorrow at {}": "明天 {}",
 "{} at {}": "{} {}",
 "soon": "即将",
+"Resets soon": "即将重置",
 # Notifications
 "Critical": "严重",
 "Burning Fast": "消耗过快",
