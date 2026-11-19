@@ -25,18 +25,16 @@ struct DashboardMetricRow: View {
                     label
                         .frame(width: widths.label, alignment: .leading)
                         .background(alignment: .leading) {
-                            Text(loc: model.label).lineLimit(1).fixedSize().hidden().measuresDashboardColumn(.label)
+                            Text(loc: model.label).lineLimit(1).fixedSize().hidden().measuresDashboardLabel()
                         }
                     LevelIndicator(fill: fill, severity: severity, paceMark: model.paceMark)
-                        .frame(minWidth: 40)
                         .frame(height: DashboardGrid.levelHeight)
                         .hoverTooltip(paceTooltip)
                     valueText(value, severity: severity)
-                        .measuresDashboardColumn(.value)
-                        .frame(width: max(widths.value, columns == nil ? DashboardGrid.valueWidth : 0), alignment: .trailing)
+                        .frame(width: DashboardGrid.valueWidth, alignment: .trailing)
                     resetText(reset, isUsedUp: isUsedUp)
-                        .measuresDashboardColumn(.reset)
-                        .frame(width: columns == nil ? (model.showsClockTimes ? DashboardGrid.clockResetWidth : DashboardGrid.resetWidth) : widths.reset, alignment: .trailing)
+                        .frame(width: model.showsClockTimes ? DashboardGrid.clockResetWidth : DashboardGrid.resetWidth, alignment: .trailing)
+                        .padding(.leading, DashboardGrid.valueResetGap)
                 }
                 .opacity(model.isFaded ? 0.5 : 1)
             case .value(let text, let detail, let severity):

@@ -13,8 +13,14 @@ enum DashboardGrid {
     static let rowHeight: CGFloat = 22
     static let levelHeight: CGFloat = 9
     static let labelWidth: CGFloat = 90
-    static let valueWidth: CGFloat = 52
-    static let resetWidth: CGFloat = 48
+    /// Fits three CJK characters (总用量) at the row font, so ordinary cards share one bar start.
+    static let minLabelWidth: CGFloat = 40
+    /// Fits 100% at the row font.
+    static let valueWidth: CGFloat = 38
+    /// Extra room between the figure and the reset, beyond `columnGap`.
+    static let valueResetGap: CGFloat = 8
+    /// Fits 23小时59分钟 / 23 hr 59 min spelled out, or 23h 59m compact.
+    static var resetWidth: CGFloat { DurationFormatSetting.current == .compact ? 52 : 76 }
     static let clockResetWidth: CGFloat = 80
 
     static let headerFont: Font = .system(size: 15, weight: .semibold)
@@ -58,43 +64,35 @@ private struct SkeletonMetricRow: View {
                 .frame(width: max(widths.label, 30), alignment: .leading)
             Capsule().frame(height: DashboardGrid.levelHeight)
             Capsule().frame(width: 30, height: 8)
-                .frame(width: max(widths.value, 30), alignment: .trailing)
+                .frame(width: DashboardGrid.valueWidth, alignment: .trailing)
             Capsule().frame(width: 30, height: 7)
-                .frame(width: max(widths.reset, 30), alignment: .trailing)
+                .frame(width: DashboardGrid.resetWidth, alignment: .trailing)
+                .padding(.leading, DashboardGrid.valueResetGap)
         }
         .skeleton()
         .frame(height: DashboardGrid.rowHeight)
     }
 }
 
-/// The label, figure, and reset columns of a card's metric rows, each as wide as its widest entry, so
-/// the bars line up without a fixed width that's too wide for 会话 or too narrow for 5天14小时.
+/// A card's label column: its widest label, never under `minLabelWidth` and never over `maxLabel`, so
+/// cards with short labels (会话, 每周, 总用量) all line up and only a card with long ones widens.
 struct DashboardColumnWidths: Equatable, Sendable {
     var label: CGFloat = 0
-    var value: CGFloat = 0
-    var reset: CGFloat = 0
 
-    /// A long label (an email, a model name) truncates past this instead of squeezing the bar.
     static let maxLabel: CGFloat = 120
 
     /// What rows outside any card use: the original fixed grid.
-    static let fallback = DashboardColumnWidths(
-        label: DashboardGrid.labelWidth, value: DashboardGrid.valueWidth, reset: DashboardGrid.resetWidth
-    )
-
-    func merged(with other: Self) -> Self {
-        Self(label: max(label, other.label), value: max(value, other.value), reset: max(reset, other.reset))
-    }
+    static let fallback = DashboardColumnWidths(label: DashboardGrid.labelWidth)
 
     var clamped: Self {
-        Self(label: min(label.rounded(.up), Self.maxLabel), value: value.rounded(.up), reset: reset.rounded(.up))
+        Self(label: min(max(label.rounded(.up), DashboardGrid.minLabelWidth), Self.maxLabel))
     }
 }
 
 struct DashboardColumnWidthsKey: PreferenceKey {
     static let defaultValue = DashboardColumnWidths()
     static func reduce(value: inout DashboardColumnWidths, nextValue: () -> DashboardColumnWidths) {
-        value = value.merged(with: nextValue())
+        value.label = max(value.label, nextValue().label)
     }
 }
 
@@ -103,31 +101,22 @@ private struct DashboardColumnsEnvironmentKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-    /// The measured columns of the enclosing card; nil outside one.
+    /// The label column of the enclosing card; nil outside one.
     var dashboardColumns: DashboardColumnWidths? {
         get { self[DashboardColumnsEnvironmentKey.self] }
         set { self[DashboardColumnsEnvironmentKey.self] = newValue }
     }
 }
 
-enum DashboardColumn { case label, value, reset }
-
 extension View {
-    /// Reports this view's natural width as one column's width.
-    func measuresDashboardColumn(_ column: DashboardColumn) -> some View {
+    /// Reports this view's natural width as a label's width.
+    func measuresDashboardLabel() -> some View {
         background(GeometryReader { proxy in
-            let width = proxy.size.width
-            Color.clear.preference(key: DashboardColumnWidthsKey.self, value: {
-                switch column {
-                case .label: DashboardColumnWidths(label: width)
-                case .value: DashboardColumnWidths(value: width)
-                case .reset: DashboardColumnWidths(reset: width)
-                }
-            }())
+            Color.clear.preference(key: DashboardColumnWidthsKey.self, value: DashboardColumnWidths(label: proxy.size.width))
         })
     }
 
-    /// Sizes the metric rows inside to their widest label, figure, and reset.
+    /// Sizes the label column of the metric rows inside to their widest label, within bounds.
     func dashboardColumns() -> some View {
         modifier(DashboardColumnsModifier())
     }
@@ -138,7 +127,7 @@ private struct DashboardColumnsModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .environment(\.dashboardColumns, widths ?? .fallback)
+            .environment(\.dashboardColumns, widths ?? DashboardColumnWidths(label: DashboardGrid.minLabelWidth))
             .onPreferenceChange(DashboardColumnWidthsKey.self) { measured in
                 let next = measured.clamped
                 if next != widths { widths = next }
