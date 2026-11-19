@@ -106,6 +106,25 @@ final class AccountStore {
         didChange?()
     }
 
+    /// Refuses to link an account to a CLI signed in to someone else. An account whose stored sign-in
+    /// is missing or names no identity can't be checked, so it links.
+    func checkCLIMatches(_ cliCredential: AccountCredential, account: Account) throws {
+        guard let cli = cliCredential.identity,
+              let stored = (try? credentialVault.load(account.id))??.identity,
+              stored != cli else { return }
+        throw ProviderError.unavailable(L("Claude Code's CLI is signed in to a different account than \(account.label)."))
+    }
+
+    /// Turns an account OpenUsage signed in itself into one that reads Claude Code's CLI login, and drops
+    /// the sign-in it held: a token copied from the CLI could never be renewed here.
+    func linkToCLI(_ id: UUID, source: LocalCredentialSource = .claudeCodeCLI) {
+        guard let index = accounts.firstIndex(where: { $0.id == id }) else { return }
+        try? credentialVault.delete(id)
+        accounts[index].localSource = source
+        persist()
+        didChange?()
+    }
+
     func remove(_ id: UUID) {
         guard let accountIndex = accounts.firstIndex(where: { $0.id == id }) else { return }
         do {

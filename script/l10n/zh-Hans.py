@@ -270,6 +270,7 @@ T = {
 "{} at {}": "{} {}",
 "soon": "即将",
 "Resets soon": "即将重置",
+"Claude Code's CLI is signed in to a different account than {}.": "Claude Code CLI 登录的不是 {} 这个账号。",
 "expires {}": "{}到期",
 # Notifications
 "Critical": "严重",

@@ -228,6 +228,12 @@ final class AddAccountFlow {
                 if let accountSignedInAgain, accountSignedInAgain.localSource != nil {
                     // Nothing to replace: the account reads the CLI's login on its next pass.
                     finish()
+                } else if let accountSignedInAgain, method == .localCLI {
+                    // Linking, not copying: the CLI's token comes without a refresh token, so a copy
+                    // would expire within hours and never renew.
+                    try store.checkCLIMatches(result.credential, account: accountSignedInAgain)
+                    store.linkToCLI(accountSignedInAgain.id)
+                    finish()
                 } else if let accountSignedInAgain {
                     try await replaceCredential(result.credential, accountSignedInAgain.cardID)
                     guard !Task.isCancelled else { return }
