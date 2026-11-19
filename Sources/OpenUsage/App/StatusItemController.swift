@@ -60,8 +60,13 @@ class MenuBarPanel: NSPanel {
            [.leftMouseDown, .rightMouseDown, .otherMouseDown].contains(event.type) {
             makeKey()
         }
+        // Scroll events reach this window only while the pointer is over it.
+        if event.type == .scrollWheel, attachedSheet == nil, onHorizontalScroll?(event) == true { return }
         super.sendEvent(event)
     }
+
+    /// Sees each scroll over the panel first; true when it used the event, which then goes no further.
+    var onHorizontalScroll: ((NSEvent) -> Bool)?
 
     /// Settings stays mounted offscreen after its first visit, where its shortcut recorder is disabled.
     /// A disabled recorder still accepts focus, and then records the next key press as the global
@@ -106,6 +111,7 @@ final class StatusItemController: NSObject {
         onDismiss: { [weak self] in self?.hidePanel() }
     )
     private let host: NSHostingView<AnyView>
+    private let tabSwipe = HorizontalSwipe()
 
     init(container: AppContainer, updater: UpdaterController) {
         self.container = container
@@ -181,6 +187,16 @@ final class StatusItemController: NSObject {
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
 
         panel.host(host)
+        panel.onHorizontalScroll = { [weak self] event in
+            guard let self, container.popover.screen == .dashboard else { return false }
+            guard let step = tabSwipe.step(for: event) else { return false }
+            let tabs = DashboardTab.allCases
+            guard let index = tabs.firstIndex(of: container.popover.dashboardTab) else { return true }
+            // No wrapping: past either end the swipe does nothing.
+            let next = index + step
+            if tabs.indices.contains(next) { container.popover.dashboardTab = tabs[next] }
+            return true
+        }
     }
 
     private func configureStatusItem() {
@@ -319,4 +335,46 @@ final class StatusItemController: NSObject {
         heightController.finishClosing()
     }
 
+}
+
+
+/// Turns horizontal scrolling over the panel into one tab step per gesture: a trackpad swipe steps once
+/// however far it goes (its momentum is ignored), a mouse's horizontal wheel steps once per notch with a
+/// short pause between steps. Mostly vertical scrolling is left alone.
+final class HorizontalSwipe {
+    /// Points of horizontal travel before a trackpad swipe counts.
+    static let threshold: CGFloat = 24
+    static let wheelPause: TimeInterval = 0.35
+
+    private var travel = CGSize.zero
+    private var stepped = false
+    private var lastWheelStep = Date.distantPast
+
+    /// -1 for the tab to the left, +1 for the one to the right, 0 when the event belongs to a horizontal
+    /// swipe that has already stepped or hasn't gone far enough, nil when it isn't horizontal scrolling.
+    func step(for event: NSEvent) -> Int? {
+        if event.momentumPhase != [] { return stepped || abs(event.scrollingDeltaX) > abs(event.scrollingDeltaY) ? 0 : nil }
+        let dx = event.scrollingDeltaX, dy = event.scrollingDeltaY
+
+        if event.hasPreciseScrollingDeltas, event.phase != [] {
+            if event.phase.contains(.began) || event.phase.contains(.mayBegin) {
+                travel = .zero
+                stepped = false
+            }
+            travel.width += dx
+            travel.height += dy
+            defer { if event.phase.contains(.ended) || event.phase.contains(.cancelled) { travel = .zero } }
+            guard abs(travel.width) > abs(travel.height) * 1.5 else { return stepped ? 0 : nil }
+            guard !stepped, abs(travel.width) >= Self.threshold else { return 0 }
+            stepped = true
+            // Fingers moving left scroll the content left, toward the tab on the right.
+            return travel.width < 0 ? 1 : -1
+        }
+
+        // A mouse wheel: no phases.
+        guard dx != 0, abs(dx) > abs(dy) else { return nil }
+        guard Date().timeIntervalSince(lastWheelStep) >= Self.wheelPause else { return 0 }
+        lastWheelStep = Date()
+        return dx < 0 ? 1 : -1
+    }
 }
