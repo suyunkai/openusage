@@ -32,3 +32,4 @@ feed/
 appcast.xml
 __pycache__/
 /Packages/
+/release/
