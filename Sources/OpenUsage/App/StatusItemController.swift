@@ -194,7 +194,9 @@ final class StatusItemController: NSObject {
             guard let index = tabs.firstIndex(of: container.popover.dashboardTab) else { return true }
             // No wrapping: past either end the swipe does nothing.
             let next = index + step
-            if tabs.indices.contains(next) { container.popover.dashboardTab = tabs[next] }
+            if tabs.indices.contains(next) {
+                withAnimation(Motion.navigation) { container.popover.dashboardTab = tabs[next] }
+            }
             return true
         }
     }
@@ -343,12 +345,17 @@ final class StatusItemController: NSObject {
 /// short pause between steps. Mostly vertical scrolling is left alone.
 final class HorizontalSwipe {
     /// Points of horizontal travel before a trackpad swipe counts.
-    static let threshold: CGFloat = 24
+    static let threshold: CGFloat = 60
     static let wheelPause: TimeInterval = 0.35
+    static let wheelNotchesPerStep = 2
+    static let wheelWindow: TimeInterval = 0.5
 
     private var travel = CGSize.zero
     private var stepped = false
     private var lastWheelStep = Date.distantPast
+    private var lastWheelNotch = Date.distantPast
+    private var wheelNotches = 0
+    private var wheelDirection = 0
 
     /// -1 for the tab to the left, +1 for the one to the right, 0 when the event belongs to a horizontal
     /// swipe that has already stepped or hasn't gone far enough, nil when it isn't horizontal scrolling.
@@ -367,14 +374,21 @@ final class HorizontalSwipe {
             guard abs(travel.width) > abs(travel.height) * 1.5 else { return stepped ? 0 : nil }
             guard !stepped, abs(travel.width) >= Self.threshold else { return 0 }
             stepped = true
-            // Fingers moving left scroll the content left, toward the tab on the right.
-            return travel.width < 0 ? 1 : -1
+            return travel.width > 0 ? 1 : -1
         }
 
-        // A mouse wheel: no phases.
+        // A mouse wheel: no phases. Two notches the same way, close together, make one step.
         guard dx != 0, abs(dx) > abs(dy) else { return nil }
-        guard Date().timeIntervalSince(lastWheelStep) >= Self.wheelPause else { return 0 }
-        lastWheelStep = Date()
-        return dx < 0 ? 1 : -1
+        let now = Date()
+        guard now.timeIntervalSince(lastWheelStep) >= Self.wheelPause else { return 0 }
+        let direction = dx > 0 ? 1 : -1
+        if direction != wheelDirection || now.timeIntervalSince(lastWheelNotch) > Self.wheelWindow { wheelNotches = 0 }
+        wheelDirection = direction
+        lastWheelNotch = now
+        wheelNotches += 1
+        guard wheelNotches >= Self.wheelNotchesPerStep else { return 0 }
+        wheelNotches = 0
+        lastWheelStep = now
+        return direction
     }
 }

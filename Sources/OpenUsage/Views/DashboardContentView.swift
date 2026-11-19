@@ -46,13 +46,16 @@ struct DashboardContentView: View {
                 .padding(.vertical, 22)
         } else {
             switch popover.dashboardTab {
+            // Priority sits to the left of All Usage, so an animated switch (a swipe) slides like pages.
             case .priority:
                 PriorityDashboardView()
+                    .transition(.move(edge: .leading).combined(with: .opacity))
             case .allUsage:
                 WidgetGroupedListView(
                     reorderSpaceName: reorderSpaceName,
                     reorderLift: $reorderLift
                 )
+                .transition(.move(edge: .trailing).combined(with: .opacity))
             }
         }
     }
