@@ -114,9 +114,9 @@ struct MenuBarTextStrip: View {
 
     private func labelledValue(_ item: MenuBarContent.Item) -> some View {
         VStack(alignment: .leading, spacing: -2) {
-            Text(item.shortLabel)
+            Text(loc: item.shortLabel)
                 .font(.system(size: 9, weight: .medium))
-            Text(item.value)
+            Text(loc: item.value)
                 .font(.system(size: 11, weight: .bold))
         }
         .fixedSize()

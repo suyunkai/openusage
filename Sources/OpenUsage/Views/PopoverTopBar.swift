@@ -119,7 +119,7 @@ private struct SettingsTabBar: View {
                 Image(systemName: tab.symbol)
                     .font(.system(size: 16))
                     .frame(height: 20)
-                Text(tab.title)
+                Text(loc: tab.title)
                     .font(.system(size: 11))
             }
             .foregroundStyle(isSelected ? AnyShapeStyle(Theme.severityColor(.normal)) : AnyShapeStyle(.secondary))

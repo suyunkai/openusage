@@ -16,7 +16,7 @@ enum GrokUsageMapper {
         }
         if config.onDemandCap > 0 {
             let cap = MetricFormatter.number(ProviderParse.centsToDollars(config.onDemandCap), kind: .dollars, style: .row)
-            lines.append(.badge(label: "Pay as you go", text: "\(cap) cap"))
+            lines.append(.badge(label: "Pay as you go", text: L("\(cap) cap")))
         }
         return ProviderUsage(lines: lines)
     }

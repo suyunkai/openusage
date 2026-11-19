@@ -14,7 +14,7 @@ struct CopilotLogin: ProviderLogin {
         } catch let error as URLError {
             guard case .enterprise(let host) = domain else { throw error }
             AppLog.warn(LogTag.auth("copilot"), "could not reach \(host): URLError \(error.code.rawValue)")
-            throw ProviderError.unavailable("Couldn’t reach \(host). Check the address and your connection.")
+            throw ProviderError.unavailable(L("Couldn’t reach \(host). Check the address and your connection."))
         }
     }
 
@@ -52,7 +52,7 @@ struct CopilotLogin: ProviderLogin {
         guard !(200..<300).contains(usage.statusCode) else { return }
         AppLog.warn(LogTag.auth("copilot"), "seat check on \(domain.host) failed with HTTP \(usage.statusCode)")
         if ProviderError.isAuthFailure(usage) || usage.statusCode == 404 {
-            throw ProviderError.unavailable("\(login) has no Copilot seat on \(domain.host). Ask your GitHub admin for one, then try again.")
+            throw ProviderError.unavailable(L("\(login) has no Copilot seat on \(domain.host). Ask your GitHub admin for one, then try again."))
         }
         throw ProviderError.failed(usage)
     }
@@ -325,9 +325,9 @@ private func deviceAuthorization(
         return switch ProviderParse.jsonObject(response.body)?["error"] as? String {
         case "authorization_pending": .pending
         case "slow_down": .slowDown
-        case "expired_token": .failed("\(provider) device sign-in expired.")
+        case "expired_token": .failed(L("\(provider) device sign-in expired."))
         case "access_denied": .failed(deniedMessage)
-        default: .failed("\(provider) device sign-in failed.")
+        default: .failed(L("\(provider) device sign-in failed."))
         }
     }
 }

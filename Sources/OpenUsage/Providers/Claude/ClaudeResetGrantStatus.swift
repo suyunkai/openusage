@@ -41,10 +41,10 @@ struct ClaudeResetGrantStatus: Hashable, Sendable, Codable {
             }
             guard let last = names.last else { return nil }
             var detail = names.count == 1
-                ? "Refills your \(last) limit now"
-                : "Refills your \(names.dropLast().joined(separator: ", ")) and \(last) limits now"
+                ? L("Refills your \(last) limit now")
+                : L("Refills your \(names.dropLast().joined(separator: L(", "))) and \(last) limits now")
             if givesBackWeekly, !clears.contains("seven_day") {
-                detail += " and gives back what Fable used of your weekly limit"
+                detail += L(" and gives back what Fable used of your weekly limit")
             }
             return detail + ". This can't be undone."
         }

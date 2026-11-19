@@ -117,13 +117,13 @@ struct WidgetData: Hashable {
         guard hasData else { return [Self.noDataDetail] }
         if let valueTextOverride { return [valueTextOverride] }
         if values.count == 1, values[0].kind == .dollars, let word = unboundedValueWord {
-            return ["\(MetricFormatter.number(values[0].number, kind: .dollars, style: .row, currencyCode: values[0].currencyCode)) \(word)"]
+            return ["\(MetricFormatter.number(values[0].number, kind: .dollars, style: .row, currencyCode: values[0].currencyCode)) \(LS(word))"]
         }
         if !values.isEmpty {
             let hasDollars = values.contains { $0.kind == .dollars }
             return values.filter { !hasDollars || $0.label != "credits" }.map { MetricFormatter.string(for: $0, style: .row) }
         }
-        return ["\(valueText) \(unboundedValueWord ?? displayMode.label.lowercased())"]
+        return ["\(valueText) \(LS(unboundedValueWord ?? displayMode.label.lowercased()))"]
     }
 
     static let expiryWarningWindow: TimeInterval = 7 * 24 * 60 * 60
@@ -180,13 +180,13 @@ extension WidgetData {
     }
 
     func paceTooltip(now: Date = Date()) -> String? {
-        if meterState(now: now) == .spent { return "Limit reached" }
+        if meterState(now: now) == .spent { return L("Limit reached") }
         guard let pace = pace(now: now) else { return nil }
         let percent = { (share: Double) in Int((share * 100).rounded()) }
         switch pace.status {
-        case .ahead: return "~\(percent(1 - pace.projectedFraction))% left at reset"
-        case .onTrack: return "~\(percent(pace.projectedFraction))% used at reset"
-        case .behind: return "~\(max(1, percent(pace.projectedFraction - 1)))% over limit at reset"
+        case .ahead: return L("~\(percent(1 - pace.projectedFraction))% left at reset")
+        case .onTrack: return L("~\(percent(pace.projectedFraction))% used at reset")
+        case .behind: return L("~\(max(1, percent(pace.projectedFraction - 1)))% over limit at reset")
         }
     }
 

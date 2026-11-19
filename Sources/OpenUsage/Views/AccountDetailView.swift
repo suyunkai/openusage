@@ -20,7 +20,7 @@ struct AccountDetailView: View {
             VStack(alignment: .leading, spacing: PanelMetrics.sectionSpacing) {
                 if let host = provider.hubHost {
                     metricsCard
-                    infoRow(icon: CLIProxyHub.markID, "Managed by \(host)")
+                    infoRow(icon: CLIProxyHub.markID, L("Managed by \(host)"))
                 } else {
                     let problem = dataStore.problem(for: providerID)
                     if let problem {
@@ -31,7 +31,7 @@ struct AccountDetailView: View {
                     }
                     metricsCard
                     if let domain = provider.domain {
-                        infoRow(icon: provider.icon, "Signed in at \(domain)")
+                        infoRow(icon: provider.icon, L("Signed in at \(domain)"))
                     }
                     VStack(spacing: 0) {
                         if let field = container.accounts.account(cardID: providerID).flatMap(Self.replacedField) {
@@ -122,7 +122,7 @@ struct AccountDetailView: View {
     private func infoRow(icon: String, _ text: String) -> some View {
         HStack(spacing: 8) {
             ProviderIcon(id: icon, side: 16, inset: 0)
-            Text(text)
+            Text(loc: text)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
                 .truncationMode(.middle)
@@ -189,7 +189,7 @@ struct ProblemCard: View {
 
     var body: some View {
         Label {
-            Text(message)
+            Text(loc: message)
                 .fixedSize(horizontal: false, vertical: true)
         } icon: {
             Image(systemName: "exclamationmark.triangle.fill")
@@ -211,7 +211,7 @@ struct AccountMetricRow<Grip: View>: View {
     var body: some View {
         HStack(spacing: 10) {
             grip
-            Text(title)
+            Text(loc: title)
             Spacer(minLength: 8)
             Button { isPinned.toggle() } label: {
                 Image(systemName: isPinned ? "pin.fill" : "pin")
@@ -222,8 +222,8 @@ struct AccountMetricRow<Grip: View>: View {
             }
             .buttonStyle(.plain)
             .disabled(!isShown)
-            .accessibilityLabel(isPinned ? "Unpin \(title)" : "Pin \(title)")
-            Toggle(title, isOn: $isShown)
+            .accessibilityLabel(isPinned ? L("Unpin \(LS(title))") : L("Pin \(LS(title))"))
+            Toggle(LS(title), isOn: $isShown)
                 .labelsHidden()
                 .toggleStyle(.switch)
                 .controlSize(.small)

@@ -47,6 +47,6 @@ struct CLIProxyHubRow: View {
 
 extension CLIProxyHub {
     static func count(_ count: Int, _ noun: String) -> String {
-        "\(count) \(noun)\(count == 1 ? "" : "s")"
+        "\(count) \(LS(noun + (count == 1 ? "" : "s")))"
     }
 }

@@ -14,13 +14,13 @@ enum ProviderError: Error, LocalizedError, Equatable {
 
     var errorDescription: String? {
         switch self {
-        case .signInExpired(let kind): "\(kind.displayName) sign-in expired. Sign in again to keep reading usage."
+        case .signInExpired(let kind): L("\(kind.displayName) sign-in expired. Sign in again to keep reading usage.")
         case .connectionFailed: "Connection failed. Check your internet connection and try again."
         case .invalidResponse: "The provider returned an invalid response."
-        case .requestFailed(let status): "The provider request failed (HTTP \(status))."
+        case .requestFailed(let status): L("The provider request failed (HTTP \(status)).")
         case .rateLimited: "The provider asked OpenUsage to wait before asking again."
         case .unavailable(let message): message
-        case .keyRejected(let message): "\(message) Replace it on the account's page."
+        case .keyRejected(let message): L("\(message) Replace it on the account's page.")
         case .unreachable(let message, _): message
         }
     }

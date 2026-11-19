@@ -183,7 +183,7 @@ struct PriorityBoardList: View {
     }
 
     private func sectionLabel(_ title: String) -> some View {
-        Text(title)
+        Text(loc: title)
             .font(.system(size: 11, weight: .semibold))
             .foregroundStyle(.secondary)
             .padding(.horizontal, 4)
@@ -215,7 +215,7 @@ struct PriorityBoardList: View {
         HStack(spacing: 10) {
             PriorityGauge(fraction: data.fraction, severity: severity, icon: provider.icon, paceMark: data.paceMark(now: now))
             VStack(alignment: .leading, spacing: 1) {
-                Text(data.title)
+                Text(loc: data.title)
                     .font(.system(size: 13, weight: .medium))
                 Text(provider.accountName)
                     .accessibilityLabel(provider.fullName)
@@ -228,18 +228,18 @@ struct PriorityBoardList: View {
             Spacer(minLength: 0)
             VStack(alignment: .trailing, spacing: 1) {
                 toggling(data.hasMeterStyleToggle ? onToggleMeterStyle : nil) {
-                    Text(data.amountText)
+                    Text(loc: data.amountText)
                         .font(.system(size: 13, weight: .medium))
                         .monospacedDigit()
                 }
                 if let callout {
-                    Text(callout.text)
+                    Text(loc: callout.text)
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(callout.color)
                         .monospacedDigit()
                 } else if let reset = data.compactResetText(now: now) {
                     toggling(onToggleResetDisplay) {
-                        Text(reset)
+                        Text(loc: reset)
                             .font(.system(size: 11))
                             .foregroundStyle(.secondary)
                             .monospacedDigit()
@@ -257,7 +257,7 @@ struct PriorityBoardList: View {
             ProviderIcon(id: item.provider.icon, side: 15, inset: 0.04)
                 .frame(width: 16)
             HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text(item.data.title)
+                Text(loc: item.data.title)
                     .font(.system(size: 13))
                 Text(item.provider.accountName)
                     .accessibilityLabel(item.provider.fullName)
@@ -270,7 +270,7 @@ struct PriorityBoardList: View {
             Spacer(minLength: 0)
             if let note = item.usedUpNote(now: now) {
                 toggling(item.data.resetsAt == nil ? nil : onToggleResetDisplay) {
-                    Text(note)
+                    Text(loc: note)
                         .font(.system(size: 12))
                         .monospacedDigit()
                         .lineLimit(1)

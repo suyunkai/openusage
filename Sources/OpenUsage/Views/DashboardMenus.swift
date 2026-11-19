@@ -73,7 +73,7 @@ struct DashboardMenu: View {
             ForEach(sections[index].indices, id: \.self) { item in
                 let entry = sections[index][item]
                 if let isChecked = entry.isChecked {
-                    Toggle(entry.title, isOn: Binding(
+                    Toggle(LS(entry.title), isOn: Binding(
                         get: { isChecked },
                         set: { _ in if let command = entry.command { perform(command) } }
                     ))
@@ -82,9 +82,9 @@ struct DashboardMenu: View {
                         if let command = entry.command { perform(command) }
                     } label: {
                         if let systemImage = entry.systemImage {
-                            Label(entry.title, systemImage: systemImage)
+                            Label(LS(entry.title), systemImage: systemImage)
                         } else {
-                            Text(entry.title)
+                            Text(loc: entry.title)
                         }
                     }
                     .disabled(entry.command == nil)

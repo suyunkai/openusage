@@ -43,7 +43,7 @@ extension WidgetData {
 
     /// The reading with the word that explains it, like `49% left`.
     var amountText: String {
-        hasMeterStyleToggle ? "\(valueText) \(displayMode.label.lowercased())" : valueText
+        hasMeterStyleToggle ? (displayMode == .remaining ? L("\(valueText) left") : L("\(valueText) used")) : valueText
     }
 
     func compactResetText(now: Date = Date()) -> String? {
@@ -68,6 +68,6 @@ extension WidgetData {
         guard hasMeterStyleToggle, let limit else { return nil }
         let other = displayMode == .remaining ? used : max(0, limit - used)
         let word = (displayMode == .remaining ? WidgetDisplayMode.used : .remaining).label.lowercased()
-        return "\(MetricFormatter.number(other, kind: kind, style: .row, currencyCode: currencyCode)) \(word)"
+        return "\(MetricFormatter.number(other, kind: kind, style: .row, currencyCode: currencyCode)) \(LS(word))"
     }
 }

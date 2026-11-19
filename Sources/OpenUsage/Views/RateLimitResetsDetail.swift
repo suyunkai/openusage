@@ -182,7 +182,7 @@ struct RateLimitResetsDetail: View {
             if let item = entry.item {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(spacing: 8) {
-                        Text(item.kind.title)
+                        Text(loc: item.kind.title)
                             .font(.callout.weight(.medium))
                             .foregroundStyle(.primary)
                             .lineLimit(1)
@@ -190,7 +190,7 @@ struct RateLimitResetsDetail: View {
                         trailing(entry)
                     }
                     .frame(height: firstLineHeight)
-                    Text(entry.expiry)
+                    Text(loc: entry.expiry)
                         .font(.system(size: 11))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
@@ -201,7 +201,7 @@ struct RateLimitResetsDetail: View {
             } else {
                 // The expiries alone, until the provider's list says what each reset is.
                 HStack(spacing: 8) {
-                    Text(entry.expiry)
+                    Text(loc: entry.expiry)
                         .font(.callout)
                         .foregroundStyle(.primary)
                         .lineLimit(1)
@@ -288,7 +288,7 @@ struct RateLimitResetsDetail: View {
                 .font(.system(size: 14))
                 .foregroundStyle(banner.tint)
                 .accessibilityHidden(true)
-            Text(banner.text)
+            Text(loc: banner.text)
                 .font(.callout.weight(.medium))
                 .foregroundStyle(banner.tint)
                 .fixedSize(horizontal: false, vertical: true)

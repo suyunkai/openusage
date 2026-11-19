@@ -123,12 +123,12 @@ enum LoginError: LocalizedError, Sendable {
         switch self {
         case .cancelled: "Sign-in was cancelled."
         case .invalidResponse: "The sign-in service returned an invalid response."
-        case .requestFailed(let status): "Sign-in failed with HTTP \(status)."
+        case .requestFailed(let status): L("Sign-in failed with HTTP \(status).")
         case .invalidState: "The sign-in response did not match this request."
         case .invalidCode: "The authorization code was invalid."
-        case .listenerFailed(let detail): "Could not start the sign-in callback: \(detail)"
+        case .listenerFailed(let detail): L("Could not start the sign-in callback: \(detail)")
         case .invalidCallback: "The sign-in callback request was invalid."
-        case .authorizationFailed(let error): "Authorization failed: \(error)"
+        case .authorizationFailed(let error): L("Authorization failed: \(error)")
         case .failed(let message): message
         }
     }

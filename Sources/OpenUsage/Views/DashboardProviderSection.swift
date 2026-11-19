@@ -51,7 +51,7 @@ struct DashboardProviderHeader: View {
             Spacer(minLength: DashboardGrid.columnGap)
             if let onCopyScreenshot {
                 CopyFeedbackButton(
-                    accessibilityLabel: "Copy \(provider.displayName) Screenshot",
+                    accessibilityLabel: L("Copy \(provider.displayName) Screenshot"),
                     isRevealed: isRevealed,
                     copied: $copied,
                     action: onCopyScreenshot
@@ -117,7 +117,7 @@ private struct PlanBadge: View {
     let plan: String
 
     var body: some View {
-        Text(plan)
+        Text(loc: plan)
             .font(DashboardGrid.planFont)
             .foregroundStyle(.secondary)
             .lineLimit(1)

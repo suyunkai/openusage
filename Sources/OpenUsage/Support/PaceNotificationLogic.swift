@@ -27,8 +27,8 @@ extension PaceMilestone {
 
     func body(_ limits: PriorityLimits) -> String {
         switch self {
-        case .critical: return "\(limits.critical)% or less left for this window."
-        case .warning: return "\(limits.warning)% or less left for this window."
+        case .critical: return L("\(limits.critical)% or less left for this window.")
+        case .warning: return L("\(limits.warning)% or less left for this window.")
         case .burningFast: return "May run out before the limit resets."
         case .useItOrLoseIt: return "Over 50% left, resets in under 24 hours."
         }

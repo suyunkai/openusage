@@ -82,14 +82,14 @@ struct PriorityItem: Identifiable {
         guard case .burningFast(let runway) = reason, let resetsAt = data.resetsAt,
               runway < resetsAt.timeIntervalSince(now), let duration = Formatters.compactDuration(runway)
         else { return nil }
-        return "Out in \(duration)"
+        return L("Out in \(duration)")
     }
 
     /// The line under the amount of a limit listed to use before it resets, in place of its reset.
     func resetsInText(now: Date) -> String? {
         guard case .useItOrLoseIt(let resetsAt) = reason, let duration = Formatters.countdown(to: resetsAt, now: now)
         else { return nil }
-        return "Resets in \(duration)"
+        return L("Resets in \(duration)")
     }
 
     /// The trailing text of a Used Up row: the time until it resets, or for a balance, which has no reset, its amount.

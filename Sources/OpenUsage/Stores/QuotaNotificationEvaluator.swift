@@ -73,7 +73,7 @@ final class QuotaNotificationEvaluator {
         providerID: String,
         providerName: @MainActor (String) -> String
     ) async -> Bool {
-        let subtitle = "\(providerName(providerID)) \(data.title)"
-        return await post("\(providerID).\(milestone.rawValue)", milestone.notificationTitle, subtitle, milestone.body(data.priorityLimits))
+        let subtitle = "\(providerName(providerID)) \(LS(data.title))"
+        return await post("\(providerID).\(milestone.rawValue)", LS(milestone.notificationTitle), subtitle, LS(milestone.body(data.priorityLimits)))
     }
 }

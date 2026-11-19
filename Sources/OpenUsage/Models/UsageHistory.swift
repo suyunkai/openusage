@@ -72,23 +72,23 @@ enum UsageWindow: Codable, Hashable, Sendable {
 
     var title: String {
         switch self {
-        case .today: "Today"
-        case .yesterday: "Yesterday"
-        case .lastDays(let count): "Last \(count) Days"
-        case .priorDays(let count): "Prior \(count) Days"
-        case .thisWeek: "This Week"
-        case .thisMonth: "This Month"
+        case .today: L("Today")
+        case .yesterday: L("Yesterday")
+        case .lastDays(let count): L("Last \(count) Days")
+        case .priorDays(let count): L("Prior \(count) Days")
+        case .thisWeek: L("This Week")
+        case .thisMonth: L("This Month")
         }
     }
 
     var phrase: String {
         switch self {
-        case .today: "today"
-        case .yesterday: "yesterday"
-        case .lastDays(let count): "in \(count) days"
-        case .priorDays(let count): "in prior \(count) days"
-        case .thisWeek: "this week"
-        case .thisMonth: "this month"
+        case .today: L("today")
+        case .yesterday: L("yesterday")
+        case .lastDays(let count): L("in \(count) days")
+        case .priorDays(let count): L("in prior \(count) days")
+        case .thisWeek: L("this week")
+        case .thisMonth: L("this month")
         }
     }
 
@@ -259,9 +259,9 @@ struct UsageBreakdown: Codable, Hashable, Sendable {
         let date = end.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted, timeZone: reportingTimeZone))
         switch window {
         case .today, .yesterday: return date
-        case .lastDays(let count), .priorDays(let count): return "\(count) Days Ending \(date)"
-        case .thisWeek: return "Week Through \(date)"
-        case .thisMonth: return "Month Through \(date)"
+        case .lastDays(let count), .priorDays(let count): return L("\(count) Days Ending \(date)")
+        case .thisWeek: return L("Week Through \(date)")
+        case .thisMonth: return L("Month Through \(date)")
         }
     }
 

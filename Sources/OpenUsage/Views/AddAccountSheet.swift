@@ -156,7 +156,7 @@ private struct BrowserSignInStep: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            SheetHeader(provider: provider, title: "Sign In to \(provider.displayName)", message: message)
+            SheetHeader(provider: provider, title: L("Sign In to \(provider.displayName)"), message: message)
             if case .deviceCode(let userCode, _) = flow.prompt {
                 DeviceCodeBox(code: userCode)
                     .padding(.horizontal, 20)
@@ -178,11 +178,11 @@ private struct BrowserSignInStep: View {
         let enterpriseDomain = flow.gitHubDomain?.saved
         return switch flow.prompt {
         case .deviceCode:
-            enterpriseDomain.map { "Open \($0)/login/device in your browser and enter this code." }
+            enterpriseDomain.map { L("Open \($0)/login/device in your browser and enter this code.") }
                 ?? "Open the verification page in your browser and enter this code."
         case .browserToken: "Continue in your browser, then paste the token it shows here."
         case .browser: "Continue in your browser. This sheet closes when you’re signed in."
-        case nil: enterpriseDomain.map { "Signing in at \($0)." } ?? "Continue in your browser. This sheet closes when you’re signed in."
+        case nil: enterpriseDomain.map { L("Signing in at \($0).") } ?? "Continue in your browser. This sheet closes when you’re signed in."
         }
     }
 
@@ -203,7 +203,7 @@ private struct BrowserSignInStep: View {
                     ProgressView()
                         .controlSize(.small)
                 }
-                Text(statusText)
+                Text(loc: statusText)
                     .foregroundStyle(.secondary)
             }
         }
@@ -230,7 +230,7 @@ private struct BrowserSignInStep: View {
                 .disabled(flow.isCodeSubmitted)
             } footer: {
                 if let footer = field.footer {
-                    Text(footer)
+                    Text(loc: footer)
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -270,8 +270,8 @@ private struct APIKeyStep: View {
     var body: some View {
         SheetHeader(
             provider: provider,
-            title: "Add \(provider.displayName)",
-            message: "Enter an API key from your \(provider.displayName) account. It’s stored in your Keychain.",
+            title: L("Add \(provider.displayName)"),
+            message: L("Enter an API key from your \(provider.displayName) account. It’s stored in your Keychain."),
             link: Link("Get Your API Key", destination: keyPage)
         )
         Form {
@@ -304,7 +304,7 @@ private struct GitHubDomainStep: View {
     var body: some View {
         SheetHeader(
             provider: provider,
-            title: "Sign In to \(provider.displayName)",
+            title: L("Sign In to \(provider.displayName)"),
             message: "Leave the domain blank for GitHub.com, or enter your company’s GitHub Enterprise address."
         )
         Form {
@@ -340,7 +340,7 @@ private struct OrganizationTokenStep: View {
     var body: some View {
         SheetHeader(
             provider: provider,
-            title: "Add \(provider.displayName)",
+            title: L("Add \(provider.displayName)"),
             message: "Enter your organization and a token that can read its billing. It’s stored in your Keychain."
         )
         Form {
@@ -416,9 +416,9 @@ struct SheetHeader: View {
                 ProviderIcon(id: icon, side: 32, inset: 0.04)
                     .padding(.bottom, 8)
             }
-            Text(title)
+            Text(loc: title)
                 .font(.headline)
-            Text(message)
+            Text(loc: message)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -457,7 +457,7 @@ struct SheetButtons: View {
 
     private func button(_ action: SheetAction, shortcut: KeyboardShortcut?) -> some View {
         Button(action: action.action) {
-            Text(action.title).frame(maxWidth: .infinity)
+            Text(loc: action.title).frame(maxWidth: .infinity)
         }
         .keyboardShortcut(shortcut)
         .disabled(action.isDisabled)
@@ -507,7 +507,7 @@ struct ErrorText: View {
     }
 
     var body: some View {
-        Label(message, systemImage: "exclamationmark.triangle.fill")
+        Label(LS(message), systemImage: "exclamationmark.triangle.fill")
             .font(.callout)
             .foregroundStyle(.red)
             .multilineTextAlignment(alignment == .center ? .center : .leading)

@@ -64,7 +64,7 @@ final class CommandLineToolInstaller {
         refreshStatus()
         guard status != .installed else { return }
         guard status != .conflict else {
-            errorMessage = "\(destinationPath) already exists and wasn't installed by OpenUsage."
+            errorMessage = L("\(destinationPath) already exists and wasn't installed by OpenUsage.")
             return
         }
         guard fileManager.isExecutableFile(atPath: sourcePath) else {
@@ -97,7 +97,7 @@ final class CommandLineToolInstaller {
         case .cancelled:
             break
         case .failure(let message):
-            errorMessage = "Couldn't \(action) the terminal helper: \(message)"
+            errorMessage = L("Couldn't \(action) the terminal helper: \(message)")
             AppLog.error(.config, "Terminal helper \(action) failed: \(message)")
         }
         refreshStatus()

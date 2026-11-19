@@ -28,7 +28,7 @@ struct CapsuleSegments<Value: Hashable>: View {
         return Button {
             selection = value
         } label: {
-            Text(label)
+            Text(loc: label)
                 .font(.system(size: fontSize, weight: isSelected ? .medium : .regular))
                 .foregroundStyle(isSelected ? AnyShapeStyle(.primary) : AnyShapeStyle(.secondary))
                 .frame(width: segmentWidth)

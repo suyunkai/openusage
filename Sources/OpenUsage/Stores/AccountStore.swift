@@ -146,10 +146,10 @@ final class AccountStore {
                     guard try credentialVault.load(account.id)?.identity == identity else { continue }
                 } catch {
                     AppLog.error(.auth, "\(account.cardID) could not check its Keychain item for a duplicate sign-in: \(error.localizedDescription)")
-                    throw ProviderError.unavailable("OpenUsage couldn't check the saved sign-in for \(account.label). Check Keychain access and try again.")
+                    throw ProviderError.unavailable(L("OpenUsage couldn't check the saved sign-in for \(account.label). Check Keychain access and try again."))
                 }
             }
-            throw ProviderError.unavailable("This account is already added as \(account.label).")
+            throw ProviderError.unavailable(L("This account is already added as \(account.label)."))
         }
     }
 

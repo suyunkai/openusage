@@ -37,6 +37,6 @@ enum MetricFormatter {
     static func string(for value: MetricValue, style: Style) -> String {
         let text = number(value.number, kind: value.kind, style: style, currencyCode: value.currencyCode)
         guard let label = value.label, !label.isEmpty else { return text }
-        return "\(text) \(label)"
+        return "\(text) \(LS(label))"
     }
 }

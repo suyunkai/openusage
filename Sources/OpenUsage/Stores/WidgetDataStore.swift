@@ -196,7 +196,7 @@ final class WidgetDataStore {
                     guard !Task.isCancelled else { return .failure(RefreshFailure(error: CancellationError())) }
                     return await provider.refresh()
                 }
-                    ?? .failure(RefreshFailure(message: "Refresh timed out after \(Int(providerRefreshTimeout))s", kind: .refused))
+                    ?? .failure(RefreshFailure(message: L("Refresh timed out after \(Int(providerRefreshTimeout))s"), kind: .refused))
                 guard case .failure(let failure) = result, failure.kind == .offline, let delay = retries.popFirst() else { return result }
                 AppLog.warn(.refresh, "\(providerID) offline: \(failure.message) Retrying in \(Int(delay.rounded(.up)))s.")
                 guard (try? await Task.sleep(for: .seconds(delay))) != nil else { return result }
@@ -345,14 +345,14 @@ final class WidgetDataStore {
         let date = now()
         let backoff = backoffs[providerID]
         if let backoff, backoff.providerAsked, date < backoff.retryAt {
-            let name = providersByID[providerID]?.provider.displayName ?? "The provider"
-            return "\(name) asked OpenUsage to wait. Retrying at \(Formatters.compactClock(backoff.retryAt, now: date))."
+            let name = providersByID[providerID]?.provider.displayName ?? L("The provider")
+            return L("\(name) asked OpenUsage to wait. Retrying at \(Formatters.compactClock(backoff.retryAt, now: date)).")
         }
         if let snapshot = snapshots[providerID], snapshot.isStale(at: date),
            let duration = Formatters.compactDuration(date.timeIntervalSince(snapshot.refreshedAt)) {
-            return "Last updated \(duration) ago"
+            return L("Last updated \(duration) ago")
         }
-        return backoff?.providerAsked == true ? "Waiting to retry after a rate limit." : nil
+        return backoff?.providerAsked == true ? L("Waiting to retry after a rate limit.") : nil
     }
 
     private func resolve(_ line: MetricLine, descriptor: WidgetDescriptor) -> WidgetData? {

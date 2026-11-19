@@ -16,9 +16,9 @@ struct MenuBarContent: Equatable {
     var isEmpty: Bool { items.isEmpty }
 
     var accessibilityText: String {
-        let shown = items.map { "\($0.provider.fullName) \($0.label) \($0.value)" }
-        let more = overflow > 0 ? ["\(overflow) more"] : []
-        let update = updateAvailable ? ["Update available"] : []
+        let shown = items.map { "\($0.provider.fullName) \(LS($0.label)) \($0.value)" }
+        let more = overflow > 0 ? [L("\(overflow) more")] : []
+        let update = updateAvailable ? [L("Update available")] : []
         return (shown + more + update).joined(separator: "; ")
     }
 }

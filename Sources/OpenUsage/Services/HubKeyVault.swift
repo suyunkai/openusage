@@ -21,11 +21,11 @@ extension HubKeyVault {
         let host = CLIProxyHub.host(of: url)
         guard let stored = try load(hubID) else {
             AppLog.error(LogTag.auth("cliproxy"), "\(host) has no stored management key")
-            throw ProviderError.unavailable("The management key for the CLIProxyAPI hub at \(host) is missing. Replace it in Accounts.")
+            throw ProviderError.unavailable(L("The management key for the CLIProxyAPI hub at \(host) is missing. Replace it in Accounts."))
         }
         guard stored.url == url else {
             AppLog.error(LogTag.auth("cliproxy"), "\(host) is not the address its management key was saved for; not sending it")
-            throw ProviderError.unavailable("The CLIProxyAPI hub at \(host) isn’t the address its management key was saved for. Remove the hub and connect it again.")
+            throw ProviderError.unavailable(L("The CLIProxyAPI hub at \(host) isn’t the address its management key was saved for. Remove the hub and connect it again."))
         }
         return stored.key
     }

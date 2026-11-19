@@ -19,6 +19,9 @@ struct SettingsScreen: View {
     @AppStorage(PaceMilestone.burningFast.settingKey) private var burningFastAlert = false
     @AppStorage(PaceMilestone.useItOrLoseIt.settingKey) private var useItOrLoseIt = false
     @AppStorage(LogLevelSetting.key) private var logLevel = LogLevelSetting.info
+    @State private var language = AppLanguage.current()
+    /// The language this launch shows, which a change only replaces at the next launch.
+    @State private var launchLanguage = AppLanguage.current()
     @State private var launchAtLogin = LaunchAtLoginSetting()
     @State private var commandLineTool = CommandLineToolInstaller()
     @State private var notificationsDenied = false
@@ -78,7 +81,19 @@ struct SettingsScreen: View {
                 .onChange(of: appearance) { AppearanceSetting.applyCurrent() }
             picker("Time Format", selection: $timeFormat, options: TimeFormatSetting.allCases.map { ($0, $0.label) })
         }
-        updatesSection
+        Section {
+            Picker("Language", selection: $language) {
+                Text("Follow System").tag(AppLanguage.system)
+                Text(verbatim: "简体中文").tag(AppLanguage.simplifiedChinese)
+                Text(verbatim: "English").tag(AppLanguage.english)
+            }
+            .onChange(of: language) { _, newValue in newValue.apply() }
+        } footer: {
+            if language != launchLanguage {
+                SettingsNote(L("Quit and reopen OpenUsage to switch the language."))
+            }
+        }
+        // This build never updates itself (no Sparkle feed), so the Updates section is left out.
     }
 
     @ViewBuilder
@@ -163,7 +178,7 @@ struct SettingsScreen: View {
                 Text("Alerts")
                 Spacer()
                 ForEach(["Priority", "Notify"], id: \.self) {
-                    Text($0)
+                    Text(loc: $0)
                         .fontWeight(.regular)
                         .foregroundStyle(.secondary)
                         .frame(width: Self.alertColumnWidth)
@@ -199,12 +214,6 @@ struct SettingsScreen: View {
             Toggle(isOn: $hideFromScreenShare.isEnabled) {
                 titled("Privacy Mode", info: "Hide usage and account names from screenshots and recordings")
             }
-            Toggle(isOn: Binding(
-                get: { container.telemetry.isEnabled },
-                set: { container.telemetry.setEnabled($0) }
-            )) {
-                titled("Help Make OpenUsage Better", info: "Share additional anonymous usage stats that tell the team where to improve.")
-            }
         } header: {
             Text("Privacy")
         }
@@ -226,16 +235,16 @@ struct SettingsScreen: View {
             Text("Command Line")
         } footer: {
             if commandLineTool.status == .conflict {
-                SettingsNote("\(commandLineTool.destinationPath) already exists and wasn't installed by OpenUsage.")
+                SettingsNote(L("\(commandLineTool.destinationPath) already exists and wasn't installed by OpenUsage."))
             } else if let errorMessage = commandLineTool.errorMessage {
                 SettingsNote(errorMessage)
             } else if case .linkedToAnotherCopy = commandLineTool.status {
-                SettingsNote("\(commandLineTool.destinationPath) points at another copy of OpenUsage. Install points it at this one.")
+                SettingsNote(L("\(commandLineTool.destinationPath) points at another copy of OpenUsage. Install points it at this one."))
             }
         }
         Section {
             Picker(selection: $logLevel) {
-                ForEach(LogLevelSetting.allCases, id: \.self) { Text($0.label).tag($0) }
+                ForEach(LogLevelSetting.allCases, id: \.self) { Text(loc: $0.label).tag($0) }
             } label: {
                 titled("Log Level", info: "How much detail OpenUsage writes to the macOS log. Choose Debug while you reproduce a problem.")
             }
@@ -245,8 +254,8 @@ struct SettingsScreen: View {
     }
 
     private func picker<Value: Hashable>(_ label: String, selection: Binding<Value>, options: [(Value, String)]) -> some View {
-        Picker(label, selection: selection) {
-            ForEach(options, id: \.0) { Text($0.1).tag($0.0) }
+        Picker(LS(label), selection: selection) {
+            ForEach(options, id: \.0) { Text(loc: $0.1).tag($0.0) }
         }
     }
 
@@ -256,7 +265,7 @@ struct SettingsScreen: View {
         } label: {
             HStack(spacing: 8) {
                 severityDot(severity)
-                Text(title)
+                Text(loc: title)
             }
         }
     }
@@ -292,7 +301,7 @@ struct SettingsScreen: View {
     /// A row's title followed by an info icon that shows what the row does on hover.
     private func titled(_ title: String, info: String) -> some View {
         HStack(spacing: 4) {
-            Text(title)
+            Text(loc: title)
             Image(systemName: "info.circle")
                 .font(.system(size: 11))
                 .foregroundStyle(.secondary)

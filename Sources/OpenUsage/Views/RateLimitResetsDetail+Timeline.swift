@@ -58,7 +58,7 @@ extension RateLimitResetsDetail {
         }
 
         var accessibilityLabel: String {
-            ["Reset \(number)", item?.kind.title, expiry, countdown.map { "expires in \($0)" } ?? "expiring"]
+            [L("Reset \(number)"), item.map { LS($0.kind.title) }, expiry, countdown.map { L("expires in \($0)") } ?? L("expiring")]
                 .compactMap { $0 }.joined(separator: ", ")
         }
     }

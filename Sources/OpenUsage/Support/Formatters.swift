@@ -24,14 +24,14 @@ enum Formatters {
                 to: calendar.startOfDay(for: date)
             ).day ?? 0
             let time = TimeFormatSetting.current.shortTime(date)
-            if dayDiff <= 0 { return "today at \(time)" }
-            if dayDiff == 1 { return "tomorrow at \(time)" }
+            if dayDiff <= 0 { return L("today at \(time)") }
+            if dayDiff == 1 { return L("tomorrow at \(time)") }
             return dateAndTime(date)
         }
     }
 
     static func dateAndTime(_ date: Date) -> String {
-        "\(monthDayLabel(date)) at \(TimeFormatSetting.current.shortTime(date))"
+        L("\(monthDayLabel(date)) at \(TimeFormatSetting.current.shortTime(date))")
     }
 
     static let imminent = "soon"

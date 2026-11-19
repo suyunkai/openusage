@@ -36,7 +36,7 @@ struct DashboardMetricRow: View {
                     Spacer(minLength: 0)
                     figure(AnyView(
                         HStack(alignment: .firstTextBaseline, spacing: 0) {
-                            Text(text)
+                            Text(loc: text)
                                 .foregroundStyle(Self.figureStyle(severity))
                             if let detail {
                                 Text(" · \(detail)")
@@ -60,12 +60,12 @@ struct DashboardMetricRow: View {
     @ViewBuilder
     private var label: some View {
         if let account {
-            Text(model.label)
+            Text(loc: model.label)
                 .lineLimit(1)
                 .truncationMode(account.isNamedByEmail ? .middle : .tail)
                 .concealingAccountName(of: account)
         } else {
-            Text(model.label)
+            Text(loc: model.label)
                 .lineLimit(1)
         }
     }
@@ -89,7 +89,7 @@ struct DashboardMetricRow: View {
 
     @ViewBuilder
     private func valueText(_ value: String, severity: WidgetData.MeterSeverity) -> some View {
-        let text = Text(value)
+        let text = Text(loc: value)
             .foregroundStyle(Self.amountStyle(severity))
             .monospacedDigit()
             .lineLimit(1)

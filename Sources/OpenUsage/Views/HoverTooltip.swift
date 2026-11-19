@@ -269,7 +269,7 @@ private struct TooltipBubble: View {
 
     private var label: some View {
         BalancedLines(maxWidth: maxTextWidth) {
-            Text(text)
+            Text(loc: text)
                 .font(.system(size: 12))
                 .foregroundStyle(.primary)
                 .multilineTextAlignment(.center)

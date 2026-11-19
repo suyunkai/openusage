@@ -24,10 +24,10 @@ struct EmptyDashboardView: View {
                 .padding(.bottom, 14)
                 .accessibilityHidden(true)
 
-            Text(copy.title)
+            Text(loc: copy.title)
                 .font(.system(size: 19, weight: .semibold))
                 .padding(.bottom, 7)
-            Text(copy.message)
+            Text(loc: copy.message)
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

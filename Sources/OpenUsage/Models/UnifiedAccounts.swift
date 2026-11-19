@@ -27,7 +27,7 @@ extension DashboardAccount {
     /// Each limit reads across the accounts that report it, so an account without it changes nothing.
     static func unifying(_ accounts: [DashboardAccount]) -> DashboardAccount {
         let kind = accounts[0].provider.kind
-        let provider = Provider(id: "\(kind.rawValue).unified", kind: kind, accountLabel: "\(accounts.count) Accounts")
+        let provider = Provider(id: "\(kind.rawValue).unified", kind: kind, accountLabel: L("\(accounts.count) Accounts"))
         let lines = mergedOrder(accounts.map { $0.lines.map(\.descriptor.key) }).compactMap { key in
             DashboardLine.unifying(accounts.compactMap { account in
                 account.lines.first { $0.descriptor.key == key }.map { DashboardLine.Member(provider: account.provider, line: $0) }

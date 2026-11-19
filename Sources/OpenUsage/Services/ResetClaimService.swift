@@ -23,10 +23,10 @@ extension ResetClaimOutcome {
         case .unconfirmed:
             "Your reset may still be going through. Check again in a minute."
         case .unavailableNow(let until):
-            "Resets can't be used right now." + (until.flatMap { Formatters.whenLabel(at: $0, mode: .relative, now: now) }
-                .map { $0 == Formatters.imminent ? " Try again soon." : " Try again in \($0)." } ?? "")
+            L("Resets can't be used right now.") + (until.flatMap { Formatters.whenLabel(at: $0, mode: .relative, now: now) }
+                .map { $0 == Formatters.imminent ? L(" Try again soon.") : L(" Try again in \($0).") } ?? "")
         case .notNextReset(let next):
-            "Claude wants \(next.map { "your \($0.title)" } ?? "another reset") used first. Nothing was used."
+            L("Claude wants \(next.map { L("your \(LS($0.title))") } ?? L("another reset")) used first. Nothing was used.")
         case .failed(.signInExpired):
             "Your sign-in expired. Sign in again from the account's page."
         case .failed(.notPermitted):

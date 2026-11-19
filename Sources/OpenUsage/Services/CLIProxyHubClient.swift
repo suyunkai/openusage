@@ -16,7 +16,7 @@ struct CLIProxyHubClient: Sendable {
             return try HubLogin.listing(from: response.body)
         } catch {
             AppLog.error(LogTag.auth("cliproxy"), "\(CLIProxyHub.host(of: url)) sent a login listing OpenUsage can't read")
-            throw ProviderError.unavailable("The CLIProxyAPI hub at \(CLIProxyHub.host(of: url)) sent a login list OpenUsage can't read.")
+            throw ProviderError.unavailable(L("The CLIProxyAPI hub at \(CLIProxyHub.host(of: url)) sent a login list OpenUsage can't read."))
         }
     }
 
@@ -88,7 +88,7 @@ struct CLIProxyHubClient: Sendable {
         let host = CLIProxyHub.host(of: url)
         guard CLIProxyHub.allowsKey(at: url) else {
             AppLog.error(LogTag.auth("cliproxy"), "\(host) is plain http outside this Mac, the local network, and Tailscale; not sending the management key")
-            throw ProviderError.unavailable("Use https for \(host). OpenUsage uses http only for a hub on this Mac, your local network, or Tailscale.")
+            throw ProviderError.unavailable(L("Use https for \(host). OpenUsage uses http only for a hub on this Mac, your local network, or Tailscale."))
         }
         let response: HTTPResponse
         do {
@@ -115,12 +115,12 @@ struct CLIProxyHubClient: Sendable {
         if pathReason == nw_path_unsatisfied_reason_local_network_denied {
             AppLog.warn(LogTag.auth("cliproxy"), "\(host) \(path) unreachable: macOS denied OpenUsage Local Network access")
             return .unreachable(
-                "macOS is keeping OpenUsage from the CLIProxyAPI hub at \(host). Allow OpenUsage under System Settings → Privacy & Security → Local Network.",
+                L("macOS is keeping OpenUsage from the CLIProxyAPI hub at \(host). Allow OpenUsage under System Settings → Privacy & Security → Local Network."),
                 offline: true
             )
         }
         AppLog.warn(LogTag.auth("cliproxy"), "\(host) \(path) unreachable: \(error.localizedDescription)")
-        return .unreachable("Can’t reach the CLIProxyAPI hub at \(host).", offline: (error as? URLError)?.meansOffline == true)
+        return .unreachable(L("Can’t reach the CLIProxyAPI hub at \(host)."), offline: (error as? URLError)?.meansOffline == true)
     }
 }
 
@@ -169,21 +169,21 @@ enum HubRefusal: Equatable {
     func error(host: String, upstream: String?) -> ProviderError {
         switch self {
         case .keyRejected:
-            .unavailable("The CLIProxyAPI hub at \(host) rejected the management key. Replace it in Accounts.")
+            .unavailable(L("The CLIProxyAPI hub at \(host) rejected the management key. Replace it in Accounts."))
         case .banned:
-            .unavailable("The CLIProxyAPI hub at \(host) blocked this Mac after too many wrong keys. Wait 30 minutes, then replace the management key in Accounts.")
+            .unavailable(L("The CLIProxyAPI hub at \(host) blocked this Mac after too many wrong keys. Wait 30 minutes, then replace the management key in Accounts."))
         case .remoteManagementOff:
-            .unavailable("The CLIProxyAPI hub at \(host) only allows management from its own machine. Turn on allow-remote in its config.")
+            .unavailable(L("The CLIProxyAPI hub at \(host) only allows management from its own machine. Turn on allow-remote in its config."))
         case .managementOff:
-            .unavailable("The CLIProxyAPI hub at \(host) has its management API turned off. Set a management key in its config.")
+            .unavailable(L("The CLIProxyAPI hub at \(host) has its management API turned off. Set a management key in its config."))
         case .loginMissing:
-            .unavailable("This login is no longer on the CLIProxyAPI hub at \(host).")
+            .unavailable(L("This login is no longer on the CLIProxyAPI hub at \(host)."))
         case .noToken:
-            .unavailable("The CLIProxyAPI hub at \(host) has no working sign-in for this login. Sign it in again on the hub.")
+            .unavailable(L("The CLIProxyAPI hub at \(host) has no working sign-in for this login. Sign it in again on the hub."))
         case .upstreamUnreachable:
-            .unreachable("The CLIProxyAPI hub at \(host) couldn’t reach \(upstream ?? "the provider").")
+            .unreachable(L("The CLIProxyAPI hub at \(host) couldn’t reach \(upstream ?? L("the provider")).")
         case .failed(let status):
-            .unavailable("The CLIProxyAPI hub at \(host) answered with an error (HTTP \(status)).")
+            .unavailable(L("The CLIProxyAPI hub at \(host) answered with an error (HTTP \(status))."))
         }
     }
 }

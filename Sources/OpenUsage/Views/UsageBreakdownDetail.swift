@@ -26,7 +26,7 @@ struct UsageBreakdownDetail: View {
             .fixedSize(horizontal: false, vertical: true)
             .overlay(alignment: .topTrailing) {
                 if case .reported(let breakdown) = content, !breakdown.isEmpty {
-                    CopyFeedbackButton(accessibilityLabel: "Copy \(breakdown.archivedTitle() ?? breakdown.window.title) Usage", copied: $copied, action: { onCopy(breakdown, figure) })
+                    CopyFeedbackButton(accessibilityLabel: L("Copy \(breakdown.archivedTitle() ?? breakdown.window.title) Usage"), copied: $copied, action: { onCopy(breakdown, figure) })
                         .padding(4)
                         .background(Theme.controlFill, in: Circle())
                         .padding(10)
@@ -46,9 +46,9 @@ struct UsageBreakdownDetail: View {
         case .reported(let breakdown):
             UsageBreakdownContent(breakdown: breakdown, provider: provider, figure: figure, onPickFigure: { figure = $0 }, animates: animates)
         case let .saved(window, figures, status, date):
-            let saved = date.map { "Saved \($0.formatted(date: .abbreviated, time: .shortened))" } ?? "Saved Total"
+            let saved = date.map { L("Saved \($0.formatted(date: .abbreviated, time: .shortened))") } ?? L("Saved Total")
             VStack(alignment: .leading, spacing: 14) {
-                UsageSummary(title: "\(window.title) · \(saved)", figures: figures)
+                UsageSummary(title: L("\(window.title) · \(saved)"), figures: figures)
                 if status.refreshing {
                     HStack(spacing: 6) {
                         MotionAwareProgressView(controlSize: .small)
@@ -183,12 +183,12 @@ private struct UsageSummary: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(title)
+            Text(loc: title)
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
             if let headline = figures.first {
-                Text(headline)
+                Text(loc: headline)
                     .font(.system(size: 26, weight: .semibold))
                     .tracking(-0.5)
                     .monospacedDigit()

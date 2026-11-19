@@ -113,7 +113,7 @@ enum KeychainVaultError: LocalizedError {
         switch self {
         case .status(let status):
             let reason = SecCopyErrorMessageString(status, nil) as String? ?? "error \(status)"
-            return "OpenUsage couldn't use its Keychain item for this account (\(reason))."
+            return L("OpenUsage couldn't use its Keychain item for this account (\(reason)).")
         }
     }
 }

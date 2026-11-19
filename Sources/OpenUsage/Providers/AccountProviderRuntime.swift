@@ -142,7 +142,7 @@ final class AccountProviderRuntime: ProviderRuntime {
         case .localCLI:
             .unavailable((ClaudeCodeCLIVault.shared.lastReadError ?? .expired(now())).localizedDescription)
         case .oauth: .signInExpired(account.kind)
-        case .apiKey: .keyRejected("\(account.kind.displayName) rejected the API key.")
+        case .apiKey: .keyRejected(L("\(account.kind.displayName) rejected the API key."))
         case .organizationToken: .keyRejected("GitHub rejected the token.")
         }
     }

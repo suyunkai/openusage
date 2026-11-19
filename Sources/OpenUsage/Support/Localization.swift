@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 /// A user-facing string, looked up in the app bundle's `Localizable.strings` like SwiftUI's own
 /// `Text("…")`. Interpolations become format arguments (`%@`, `%lld`, `%lf`), so the key matches what
@@ -31,5 +32,21 @@ enum AppLanguage: String, CaseIterable, Identifiable, Sendable {
         case .system: defaults.removeObject(forKey: Self.defaultsKey)
         case .simplifiedChinese, .english: defaults.set([rawValue], forKey: Self.defaultsKey)
         }
+    }
+}
+
+/// Looks up a string that was built in English elsewhere (a metric's title, an error's description) by
+/// its exact text, so data that doubles as an identifier stays English and only its display changes.
+/// A string with no entry, such as one carrying a name or a number, shows as it is.
+func LS(_ text: String) -> String {
+    Bundle.main.localizedString(forKey: text, value: text, table: nil)
+}
+
+
+extension Text {
+    /// `Text(verbatim:)` for an already-built string, translated by its exact English text when the
+    /// table has it.
+    init(loc text: String) {
+        self.init(verbatim: LS(text))
     }
 }

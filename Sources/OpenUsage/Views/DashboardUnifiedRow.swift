@@ -59,10 +59,10 @@ struct UnifiedLimitDetail: View {
         TimelineView(.periodic(from: .now, by: 30)) { context in
             VStack(alignment: .leading, spacing: 0) {
                 HStack(alignment: .firstTextBaseline, spacing: DashboardGrid.columnGap) {
-                    Text(line.data.title)
+                    Text(loc: line.data.title)
                         .font(.system(size: 13, weight: .semibold))
                     Spacer(minLength: 0)
-                    Text(line.members.count == 1 ? "1 Account" : "\(line.members.count) Accounts")
+                    Text(verbatim: line.members.count == 1 ? L("1 Account") : L("\(line.members.count) Accounts"))
                         .font(.system(size: 11))
                         .foregroundStyle(.secondary)
                 }

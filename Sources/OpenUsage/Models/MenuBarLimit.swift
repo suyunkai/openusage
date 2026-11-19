@@ -20,6 +20,6 @@ enum MenuBarLimit: String, Hashable, Sendable, CaseIterable {
     }
 
     var label: String {
-        self == .iconOnly ? "App Icon Only" : "Up to \(count)"
+        self == .iconOnly ? "App Icon Only" : L("Up to \(count)")
     }
 }

@@ -184,8 +184,8 @@ struct PopoverFooter: View {
         let totalSeconds = Int(remaining.rounded(.up))
         if totalSeconds >= 60 {
             let minutes = Int((Double(totalSeconds) / 60).rounded(.up))
-            return "Next update in \(minutes)m"
+            return L("Next update in \(minutes)m")
         }
-        return "Next update in \(totalSeconds)s"
+        return L("Next update in \(totalSeconds)s")
     }
 }
