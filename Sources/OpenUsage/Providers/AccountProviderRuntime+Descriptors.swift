@@ -37,7 +37,8 @@ extension AccountProviderRuntime {
                     .exportingLimit("credits", kind: .balance, unit: "credits", source: .value(kind: .count, label: "credits")),
                 .boundedCount(key: "creditLimit", provider: provider, title: "Credit Limit", limit: 0),
                 rateLimitResets(key: "rateLimitResets", provider: provider),
-                .history(key: "today", provider: provider, .window(.today, .tokens)),
+                // No Today row: ChatGPT reports usage on UTC days, once a day after the day ends, so
+                // today's figure is always missing and read as zero.
                 .history(key: "yesterday", provider: provider, .window(.yesterday, .tokens)),
                 .history(key: "last30", provider: provider, .window(.lastDays(30), .tokens))
             ]
