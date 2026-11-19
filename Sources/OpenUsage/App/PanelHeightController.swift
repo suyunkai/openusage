@@ -183,7 +183,7 @@ enum PanelGeometry {
 
     static func maximumHeight(topLeft: NSPoint, visibleFrame: NSRect) -> CGFloat {
         let roomBelowAnchor = topLeft.y - visibleFrame.minY - screenMargin
-        let aestheticCap = floor(visibleFrame.height * 0.85)
+        let aestheticCap = floor(visibleFrame.height * 0.92)
         return max(1, min(roomBelowAnchor, aestheticCap))
     }
 
